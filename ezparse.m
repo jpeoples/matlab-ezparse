@@ -22,7 +22,26 @@ function [ argstruct, unparsed ] = ezparse( argstruct, argin )
 %   this is up to the user, for example it could simply be ignored, warned
 %   about, or throw an error, depending on the application.
 %
+%   NOTE:
+%   If argin is instead a struct, it is assumed that the caller wants
+%   struct style arg parsing, so for any field in argin matching a field of
+%   argstruct, argstruct.field is overwritten with argin.field.  Fields of
+%   argin not contained in argin are returned as unparsed, where unparsed
+%   will be a cell array of the unparsed field-names.
+%
 
+
+if isstruct(argin)
+    [argstruct, unparsed] = struct_args(argstruct, argin);
+elseif iscell(argin)
+    [argstruct, unparsed] = cell_args(argstruct, argin);
+else
+    unparsed = argin;
+end
+
+end
+
+function [argstruct, unparsed] = cell_args(argstruct, argin)
 argnames = fieldnames(argstruct);
 
 na = length(argin);
@@ -59,4 +78,29 @@ unparsed = argin;
 
 
 end
+
+
+function [argstruct, unparsed] = struct_args(argstruct, argin)
+
+infields = fieldnames(argin);
+rem = zeros(length(infields), 1);
+remc = 0;
+for i = 1:length(infields)
+
+    fld = infields{i};
+
+    if isfield(argstruct, fld)
+        argstruct.(fld) = argin.(fld);
+        remc = remc + 1;
+        rem(remc) = i;
+    end
+end
+
+rem(remc+1:end) = [];
+infields(rem) = [];
+
+% fields not in argstruct are returned as unparsed!
+unparsed = infields;
+end
+
 

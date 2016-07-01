@@ -21,7 +21,7 @@ function [output] = funcname(required, arguments, varargin)
 ```
 and I could call the function as follows (for example):
 
-    funcname(required, arg, 'bar' 10, 'verbose', foo', 3, );
+    funcname(required, arg, 'bar' 10, 'verbose', 'foo', 3, );
 
 resulting in
 
